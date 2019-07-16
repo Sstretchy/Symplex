@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Symplix</title>
+</head>
+<body>
+
+<script type="text/javascript">
+    function validate(){
+        //Считаем значения из полей name и email в переменные x и y
+        var x=document.forms["form"]["kolOgr"].value;
+        localStorage["ogr"]=x;
+        var y=document.forms["form"]["kolPer"].value;
+        localStorage["per"]=y;
+        var max = document.querySelector('input[type=radio][name=maxmin][id=max]');
+        var min = document.querySelector('input[type=radio][name=maxmin][id=min]');
+
+
+        if (x.length===0){
+            document.getElementById("kolOgrf").innerHTML="*данное поле обязательно для заполнения";
+            return false;
+        }
+        if (isNaN(x)===true){
+            document.getElementById("kolOgrf").innerHTML="*вводите только целые числа";
+            return false;
+        }
+        if (parseInt(x, 10)<1 || parseInt(x, 10)>16){
+            document.getElementById("kolOgrf").innerHTML="*вводите числа от 1 до 16";
+            return false;
+        }
+
+        if (y.length===0){
+            document.getElementById("kolPerf").innerHTML="*данное поле обязательно для заполнения";
+            return false;
+        }
+        if (isNaN(y)===true) {
+            document.getElementById("kolPerf").innerHTML = "*вводите только целые числа";
+            return false;
+        }
+        if ((parseInt(y, 10)<parseInt(x, 10))|| (parseInt(y, 10)>16)){
+            document.getElementById("kolPerf").innerHTML="*вводите числа от "+x+"  до 16";
+            return false;
+        }
+
+        if ((!(max.checked))&&(!(min.checked))) {
+            document.getElementById("minmaxf").innerHTML="Максимизируйте или минимизируйте целевую функцию.";
+            return false;
+        }
+        if (max.checked){
+            var maxmin="max";
+        }
+        else
+        {
+            var maxmin="min";
+        }
+        localStorage["maxmin"]=maxmin;
+        window.location.href="secondpage.html";
+        event.preventDefault();
+
+    }
+</script>
+
+
+<form name="form" onsubmit="return validate()" >
+    Количество ограничений: <input type="text" name="kolOgr"> <span style="color:#0c045c" id="kolOgrf"></span><br>
+    Количество переменных: <input type="text" name="kolPer"> <span style="color:#0c045c" id="kolPerf"></span><br>
+
+    <input type="radio" name="maxmin" id="max" />max
+    <input type="radio" name="maxmin" id="min"/>min <br><span style="color:#0c045c" id="minmaxf"></span><br>
+
+
+    <br><input type="submit" value="Отправить">
+
+
+</form>
+
+
+
+</body>
+</html>

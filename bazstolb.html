@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<form name="form" onsubmit="return validateBaz()" >
+    Напишите <span id="limit_quantity"></span> номера базисных столбцов через пробел: <input type="text" id="bazper">
+    <span style="color:#0c045c" id="bazpercheck"></span><br>
+
+    <br><input type="submit" value="Отправить">
+
+
+</form>
+
+<script>
+    x=localStorage.getItem('ogr');
+    document.getElementById("limit_quantity").innerHTML=x;
+    function validateBaz() {
+
+        strbaz=document.getElementById('bazper').value;
+        var baz = strbaz.split(' ');
+        if(baz.length != x){
+            document.getElementById("bazpercheck").innerHTML="*неверное число ограничений";
+            return false;
+        }
+        for (var i=0; i<parseInt(x, 10); i++){
+            if (isNaN(baz[i])===true){
+                document.getElementById("bazpercheck").innerHTML="*вводите только целые числа";
+                return false;
+            }
+        }
+        for (var i=0; i<parseInt(x, 10); i++) {
+            if ((parseInt(baz[i], 10) < 1)||(parseInt(baz[i], 10) >localStorage.getItem('per'))) {
+                document.getElementById("bazpercheck").innerHTML = "*номера ограничений могут быть от 1 до "+(localStorage.getItem('per'));
+                return false;
+            }
+        }
+        var count=0;
+        for (var i=0; i<parseInt(x, 10); i++) {
+            for(var j=0; j<parseInt(x, 10); j++){
+                if (baz[i]===baz[j]){
+                    count++;
+                    if(count===1){
+                        count=0;
+                    }
+                    if (count>1){
+                        document.getElementById("bazpercheck").innerHTML = "*повторы";
+                        return false;
+                    }
+                }
+            }
+        }
+        baz.sort();
+
+
+        localStorage["baz"]=baz;
+        window.location.href="gauss.html";
+        event.preventDefault();
+
+
+
+
+    }
+
+
+</script>
+</body>
+</html>

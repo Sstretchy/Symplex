@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Symplix</title>
+    <script src="fraction.js"></script>
+
+    <style type="text/css">
+        BODY {
+            background: white; /* Цвет фона веб-страницы */
+        }
+        TABLE {
+            width: 300px; /* Ширина таблицы */
+            border-collapse: collapse; /* Убираем двойные линии между ячейками */
+            border: 2px solid white; /* Прячем рамку вокруг таблицы */
+        }
+        TD, TH {
+            padding: 3px; /* Поля вокруг содержимого таблицы */
+            border: 1px solid maroon; /* Параметры рамки */
+            text-align: left; /* Выравнивание по левому краю */
+        }
+
+        BUTTON {
+            display: inline-block;
+            width: 100%;
+            padding: 8px;
+            color: black;
+            border: none;
+            text-align: center;
+            outline: none;
+            text-decoration: none;
+            background-color: white;
+
+        }
+        button:hover,
+        button:active {
+            background-color: white;
+            color: black;
+            opacity: 0.5;
+        }
+    </style>
+
+
+</head>
+<body>
+
+
+
+
+<script>
+
+    // todo start gauss
+
+    let strk = parseInt(localStorage.getItem('ogr'));
+    let stlb = parseInt(localStorage.getItem('per'));
+    let baz = localStorage.getItem('baz').split(',');
+    let b = localStorage.getItem('arrMat').split(',');
+    b.reverse();
+    let a=[];
+
+
+    alert(b);
+    for(let i = 0; i < strk; i++) {
+        a[i] = [];
+        for (let j = 0; j < stlb + 1; j++) {
+            a[i][j] = b.pop();
+        }
+    }
+    alert(a);
+    for (let i = 0; i < baz.length; i++) {
+        baz[i] = parseInt(baz[i]);
+    }
+
+    for(let i = 0; i < strk; i++){
+        baz[i] = baz[i] - 1;
+    }
+    for(let j = 0; j < strk; j++){
+        for(let i = 0; i < strk; i++){
+            [a[i][j], a[i][baz[j]]]= [a[i][baz[j]], a[i][j]]
+        }
+    }
+
+
+/*[[ 1. -3. -0.]
+ [ 0.  0.  0.]]*/
+
+    let s = strk;
+    let g = strk;
+    let e = 0;
+    j = 0;
+    let k = 0;
+    let str = strk;
+    let stop = 0;
+    let idTab = 0;
+    let funk = localStorage.getItem('arrF').split(',');
+    let maxmin = localStorage.getItem(('maxmin'));
+    funk.push(0);
+
+    while(strk !== 0){
+        // Прямой ход todo наверное
+        for(let i = 0; i < strk; i++){
+            if ((a[i+e][j+e])!=='0'){
+                let vrem1 = a[i + e][j + e];
+                for(let w = 0; w < stlb + 1; w++){
+                    a[i+e][w] = new Fraction(a[i+e][w]).divide(new Fraction(vrem1));
+                }
+            }
+        }
+
+        // Обратный ход todo наверное
+        for(let i = 1; i < strk; i++){
+            if((a[i + e][j + e]) !== '0'){
+                for(let w = 0; w < stlb + 1; w++){
+                    a[i+e][w]=new Fraction(a[i+e][w]).subtract(new Fraction(a[j+e][w]))
+                }
+            }
+        }
+        e++;
+        strk = strk - 1;
+
+    }
+    let p = s - 1;
+
+    while (s!==0){
+        for(i=s-1; i>-1; i--){
+            if((a[i][s-1])!='0'){
+                var vrem2=a[i][s-1];
+                for(w=0; w<stlb+1; w++){
+                    a[i][w]=new Fraction(a[i][w]).divide(new Fraction(vrem2))
+                }
+            }
+        }
+
+        for(var i=s-2; i>-1; i--){
+            if((a[i][s-1])!='0'){
+                for(w=0; w<stlb+1; w++){
+                    a[i][w]=new Fraction(a[i][w]).subtract(new Fraction(a[p][w]))
+                }
+
+            }
+        }
+        p=p-1;
+        s=s-1;
+    }
+    var check=0;
+    for(var i=0; i<str; i++){
+        if(a[i][i]=="0"){
+            check=0;
+        }
+        else{
+            check++
+        }
+    }
+
+    // todo end gauss
+
+    function returnFirstPage(){
+        window.location.href="firstpage.html";
+        event.preventDefault();
+    }
+
+    let testMatrix = false;
+    for (let i = 0; i < a.length; i++){
+        for (let j = 0; j < a[i].length; j++){
+            if (isNaN(a[i][j].numerator)){
+                testMatrix = true;
+            }
+        }
+    }
+
+    if(check !== str || testMatrix){
+        document.body.innerHTML="Вы ввели коэффициенты вырожденной матрицы.<br>" +
+            "<form name=\"form\" onsubmit=\"return returnFirstPage()\">"+
+            "    <br><input type=\"submit\" value=\"Ввести другие коэффициенты\">\n" +
+            "</form>";
+    }
+
+    if(check===str && !testMatrix){
+        for(j = g-1; j>-1; j--){
+            for(var i=g-1; i>-1; i--){
+                [a[i][j], a[i][baz[j]]] = [a[i][baz[j]], a[i][j]]
+            }
+        }
+
+        // todo пересчет футера
+        let a1 = [];  // Это новый футер, как я понимаю
+        for(let i = 0; i < g; i++){  // todo тупо copy
+            a1[i] = [];
+            for(let j = 0; j < stlb + 1; j++){
+                a1[i][j] = a[i][j].clone();  // matrix copy
+            }
+        }
+
+        for(let i = 0; i < g; i++){  // пробегаем каждое ограничение в матрице
+            for(let j = 0; j <= stlb; j++)  // каждый элемент в ограничении
+            {
+                a1[i][j]=new Fraction(a1[i][j]).multiply(new Fraction(funk[baz[i]])).multiply(-1);  // Как я понял, тут мы просто домножаем
+            }
+        }
+
+        for(let i = 0; i < stlb + 1; i++){  // todo понять зачем
+            for(let w = 0; w < g; w++){
+                funk[i] = new Fraction(funk[i]).add(new Fraction(a1[w][i]))  // todo тадам
+            }
+        }
+
+        // todo конец
+
+
+
+        if (maxmin==='max'){
+            for(var i=0; i< stlb+1; i++){
+                funk[i]=new Fraction(funk[i]).multiply(new Fraction(-1))
+            }
+        }
+        var baz1=[];
+        baz1.length=baz.length;
+        for(var i=0; i<baz.length; i++){
+            baz1[i]=baz[i]+1;
+        }
+
+
+
+        var simp=[[" "]];
+        var h=[];
+        for(i=1; i< stlb+1; i++){
+            if(baz1.includes(i)===false){
+                simp[0].push("x"+i)
+            }
+        }
+        simp[0].push('const');
+        for(var i=0; i<baz1.length; i++){
+            h.push("x"+baz1[i]);
+            for(j = 0; j< stlb+1; j++){
+                if(baz.includes(j)===false){
+                    h.push(a[i][j])
+                }
+            }
+            simp.push(h);
+            h=[]
+        }
+        t=[' '];
+        for(var i=0; i< stlb+1; i++){
+            if (baz.includes(i)===false){
+                t.push(funk[i])
+            }
+        }
+
+
+
+
+        simp.push(t);
+        var stl=simp[0].length;
+
+
+
+
+        //положительные константы:
+
+        for(var i=1; i<=g;i++){
+            if((new Fraction(simp[i][stl-1]).numerator)<0){
+                for(j = 1; j<=stl-1; j++){
+                    simp[i][j]=new Fraction(simp[i][j]).multiply(new Fraction(-1))
+                }
+            }
+        }
+
+        //Тут функция генерации таблицы
+        function createTbl() {
+
+
+            var s = "<table>";
+
+            for(var i = 0; i <g+2; i++){
+                s+='<tr>';
+                for(var j=0; j< stl; j++){
+                    s += "<th id ='table"+idTab+i+j+"'><button type= 'submit' id='but"+idTab+i+j+"'> "+simp[i][j]+ "</button></th>";
+                }
+                s+='</tr>'
+
+            }
+            s += "</table> <br><br> ";
+            s+="<form name=\"form\" onsubmit=\"return comeback()\" > <br><input type=\"submit\" value=\"Назад\"> </form>";
+            document.body.innerHTML += s;
+        }
+
+
+        //проверка на бексонечное ребро
+        // todo тут косячок
+        function infRebro() {
+            for (let x = 0; x < a[0].length; x++){  // идем по столбцам
+                let flag = true;
+                for (let y = 0; y < a.length; y++){  // Идем по строчкам
+                    if (a[y][x].numerator >= 0){
+                        flag = false;  // Говорим, что в этом ребре нет бесконечности
+                        break;
+                    }
+                }
+
+                if (flag && funk[x].numerator < 0){  // Если в этом ребре возможно бесконечночть, то проверяем футер
+                    document.body.innerHTML+="<br><br>*бесконечное ребро";
+                    stop++;
+                    break;
+                }
+            }
+        }
+
+
+        // проверка на положительные коэффициенты внизу
+        function bottomKCheck() {
+            var answer=0;
+            for(var i=1;i<stl-1; i++){
+                if((new Fraction(simp[g+1][i]).numerator)>=0){
+                    answer++;
+                }
+            }
+            // вывод ответа
+            if(answer===stl-2){
+                ans="<br><br>Получен ответ:<br>";
+                if (maxmin==='max'){
+                    l = new Array(stlb).fill(0);
+                    ans+="F(x) = "+new Fraction(simp[g+1][stl-1]).multiply(new Fraction(1))+"<br>(";
+                    for(var i=1; i<=g; i++){
+                        k=simp[i][0][1];
+                        l[k-1]=simp[i][stl-1]
+                    }
+
+                    ans+= l+")";
+                    document.body.innerHTML=ans;
+                    stop++;
+                    createTbl()
+
+
+
+                }
+                if (maxmin==='min'){
+                    l = new Array(stlb).fill(0);
+                    ans+="F(x) = "+new Fraction(simp[g+1][stl-1]).multiply(new Fraction(-1))+"<br>(";
+                    for(var i=1; i<=g; i++){
+                        k=simp[i][0][1];
+                        l[k-1]=simp[i][stl-1]
+                    }
+
+                    ans+= l+")";
+                    document.body.innerHTML=ans;
+                    stop++;
+                    createTbl()
+
+
+                }
+
+            }
+        }
+
+
+        //поиск и подсветка опорных
+        function oporSearch() {
+            var opor=99999999999;
+            for(var j=1; j<stl-1; j++){
+                if((new Fraction(simp[g+1][j]).numerator)<0){
+                    for(var i=1; i<=g; i++){
+                        if((((new Fraction(simp[i][stl-1]).divide(new Fraction(simp[i][j]))).numerator)>=0)){
+                            if(   (((new Fraction(simp[i][stl-1]).numerator)/(new Fraction(simp[i][stl-1]).denominator))/
+                                ((new Fraction(simp[i][j]).numerator)/(new Fraction(simp[i][j]).denominator)))<=opor  ){
+
+                                opor=(((new Fraction(simp[i][stl-1]).numerator)/(new Fraction(simp[i][stl-1]).denominator))/
+                                    ((new Fraction(simp[i][j]).numerator)/(new Fraction(simp[i][j]).denominator)))
+                            }
+                        }
+
+                    }
+                }
+                for(var t=1; t<=g; t++){
+                    if(opor===((((new Fraction(simp[t][stl-1]).numerator)/(new Fraction(simp[t][stl-1]).denominator))/
+                        ((new Fraction(simp[t][j]).numerator)/(new Fraction(simp[t][j]).denominator))))){
+                        document.getElementById("table"+idTab+t+j).setAttribute("bgcolor", "#87ceeb");
+                        document.getElementById("but"+idTab+t+j).setAttribute("onclick", "getOpor(this.id)");
+                    }
+                }
+                opor=99999999999;
+            }
+        }
+        function getOpor(t) {
+            var ti=parseInt(t[4]);
+            var tj=parseInt(t[5]);
+
+
+            var vrem3=simp[0][tj];
+            simp[0][tj]=simp[ti][0];
+            simp[ti][0] = vrem3;
+
+
+            for (var i=1; i<g+2; i++){
+                for (var j=1; j< stl; j++){
+                    if(i!==ti){
+                        if(j!==tj){
+                            simp[i][j]= new Fraction(simp[i][j]).subtract(new Fraction( ((new Fraction(simp[ti][j]).multiply(new Fraction(simp[i][tj]))).divide(new Fraction(simp[ti][tj]))) ))
+                        }
+                    }
+                }
+            }
+
+            for(var i=1; i<g+2; i++){
+                if(i!==ti){
+                    simp[i][tj]=(new Fraction(simp[i][tj]).multiply(new Fraction(-1))).divide(new Fraction(simp[ti][tj]))
+                }
+            }
+            for(var j=1; j<stl; j++){
+                if(j!==tj){
+                    simp[ti][j]=new Fraction(simp[ti][j]).divide(new Fraction(simp[ti][tj]))
+                }
+            }
+
+            simp[ti][tj]=new Fraction(1).divide(new Fraction(simp[ti][tj]));
+            idTab++;
+
+
+            sympstep()
+
+        }
+
+
+
+
+        sympstep();
+        function sympstep() {
+            infRebro();
+            bottomKCheck();
+            if (stop===0){
+                document.body.innerHTML='';
+                createTbl();
+
+
+                oporSearch()
+            }
+        }
+        function comeback() {
+            if (idTab!==0){
+                idTab--;
+            }
+    }
+
+
+    }
+
+
+
+
+
+
+
+</script>
+
+</body>
+</html>

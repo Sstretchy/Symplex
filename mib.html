@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="fraction.js"></script>
+    <style type="text/css">
+        BODY {
+            background: white; /* Цвет фона веб-страницы */
+        }
+        TABLE {
+            width: 300px; /* Ширина таблицы */
+            border-collapse: collapse; /* Убираем двойные линии между ячейками */
+            border: 2px solid white; /* Прячем рамку вокруг таблицы */
+        }
+        TD, TH {
+            padding: 3px; /* Поля вокруг содержимого таблицы */
+            border: 1px solid maroon; /* Параметры рамки */
+            text-align: left; /* Выравнивание по левому краю */
+        }
+
+        BUTTON {
+            display: inline-block;
+            width: 100%;
+            padding: 8px;
+            color: black;
+            border: none;
+            text-align: center;
+            outline: none;
+            text-decoration: none;
+            background-color: white;
+
+        }
+        button:hover,
+        button:active {
+            background-color: white;
+            color: black;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+<script>
+    g=parseInt(localStorage.getItem('ogr'));
+    stlb=parseInt(localStorage.getItem('per'));
+    b=localStorage.getItem('arrMat').split(',');
+    b.reverse();
+    funk=new Array(stlb+1).fill(0);
+
+
+        var k=0;  var stop=0; var idTab=0;
+
+    var a=[];
+    for(var i=0; i< g; i++) {
+        a[i] = [];
+        for (var j = 0; j < stlb + 1; j++) {
+            a[i][j] = b.pop();
+        }
+    }
+
+    for(var i=0; i< stlb+1; i++){
+        for(var w=0; w<g; w++){
+            funk[i]=new Fraction(funk[i]).add(new Fraction(a[w][i]))
+
+
+        }
+    }
+    for(var i=0; i<funk.length; i++){
+        funk[i]=new Fraction(funk[i]).multiply(new Fraction(-1))
+    }
+    a.push(funk)
+
+
+    h=[]
+
+    var simp=[[" "]];
+    for(var i=1; i< stlb+1; i++){
+        simp[0].push("x"+i);
+    }
+    simp[0].push('const')
+
+    for(var i=0; i<g; i++){
+        h.push("x"+(stlb+1+i));
+        for(var j=0; j< stlb+1; j++){
+            h.push(a[i][j])
+        }
+        simp.push(h);
+        h=[]
+    }
+    funk.unshift(' ');
+    simp.push(funk);
+
+    var stl=simp[0].length;
+    //положительные константы:
+
+    for(var i=1; i<=g;i++){
+        if((new Fraction(simp[i][stl-1]).numerator)<0){
+            for(var j=1; j<=stl-1; j++){
+                simp[i][j]=new Fraction(simp[i][j]).multiply(new Fraction(-1))
+            }
+        }
+    }
+    function createTbl0() {
+
+
+        var s = "<table>";
+
+        for(var i = 0; i <g+2; i++){
+            s+='<tr>'
+            for(var j=0; j< stl; j++){
+                s += "<th id ='table"+idTab+i+j+"'><button type= 'submit' id='but"+idTab+i+j+"'> "+simp[i][j]+ "</button></th>";
+            }
+            s+='</tr>'
+
+        }
+        s += "</table> <br><br> ";
+        s+="<form name=\"form\" onsubmit=\"return comeback0()\" > <br><input type=\"submit\" value=\"Назад\"> </form>"
+        document.body.innerHTML += s;
+    }
+
+
+    //проверка на бексонечное ребро
+    function infRebro0() {
+
+        for(var j=1; j<stl-1; j++){
+            var fO=0
+            for(var i=1; i<g+2; i++){
+
+                if((new Fraction(simp[i][j]).numerator)>0){
+                    break;
+                }
+                else{
+                    fO++;
+
+                }
+
+            }
+            if(fO===g+1){
+                createTbl0()
+                document.body.innerHTML+="<br><br>*бесконечное ребро";
+                stop++;
+                break;
+            }
+        }
+    }
+
+
+    // проверка на положительные коэффициенты внизу
+    function bottomKCheck0() {
+        if((new Fraction(simp[g+1][stl-1]).numerator)>0){
+            document.body.innerHTML='Система несовместна';
+
+
+            stop++;
+        }
+        if((new Fraction(simp[g+1][stl-1]).numerator)===0){
+            document.body.innerHTML='ня';
+            createTbl0()
+            stop++;
+            simp.shift();
+            for(var i=0; i<=g; i++) {
+                simp[i].shift()
+            }
+            console.log('123', simp)
+
+            var saveIndexList = [];
+            for(var i = 0; i < simp[simp.length - 1].length; i++) {
+                if(simp[simp.length - 1][i].numerator !== simp[simp.length - 1][i].denominator) {
+                    saveIndexList.push(i);
+                }
+            }
+            console.log('456', saveIndexList);
+            simp = simp.map(function (el) {
+                return el.filter(function (subEl, subKey) {
+                    return saveIndexList.indexOf(subKey) !== -1;
+                });
+            });
+            console.log('789', simp);
+            // console.log('456', saveIndexList);
+            for(var j=0; j<stlb; j++){
+                if(new Fraction(simp[g][j]).numerator===1){
+
+                }
+            }
+            document.body.innerHTML+= simp
+        }
+
+    }
+
+
+    //поиск и подсветка опорных
+    function oporSearch0() {
+        var opor=99999999999;
+        for(var j=1; j<stl-1; j++){
+            if((new Fraction(simp[g+1][j]).numerator)<0){
+                for(var i=1; i<=g; i++){
+                    if((((new Fraction(simp[i][stl-1]).divide(new Fraction(simp[i][j]))).numerator)>=0)){
+                        if(   (((new Fraction(simp[i][stl-1]).numerator)/(new Fraction(simp[i][stl-1]).denominator))/
+                            ((new Fraction(simp[i][j]).numerator)/(new Fraction(simp[i][j]).denominator)))<=opor  ){
+
+                            opor=(((new Fraction(simp[i][stl-1]).numerator)/(new Fraction(simp[i][stl-1]).denominator))/
+                                ((new Fraction(simp[i][j]).numerator)/(new Fraction(simp[i][j]).denominator)))
+                        }
+                    }
+
+                }
+            }
+            for(var t=1; t<=g; t++){
+                if(opor===((((new Fraction(simp[t][stl-1]).numerator)/(new Fraction(simp[t][stl-1]).denominator))/
+                    ((new Fraction(simp[t][j]).numerator)/(new Fraction(simp[t][j]).denominator))))){
+                    document.getElementById("table"+idTab+t+j).setAttribute("bgcolor", "#87ceeb");
+                    document.getElementById("but"+idTab+t+j).setAttribute("onclick", "getOpor(this.id)");
+                }
+            }
+            opor=99999999999;
+        }
+    }
+    function getOpor(t) {
+        var ti=parseInt(t[4])
+        var tj=parseInt(t[5])
+
+
+        var vrem3=simp[0][tj]
+        simp[0][tj]=simp[ti][0]
+        simp[ti][0] = vrem3
+
+
+        for (var i=1; i<g+2; i++){
+            for (var j=1; j< stl; j++){
+                if(i!==ti){
+                    if(j!==tj){
+                        simp[i][j]= new Fraction(simp[i][j]).subtract(new Fraction( ((new Fraction(simp[ti][j]).multiply(new Fraction(simp[i][tj]))).divide(new Fraction(simp[ti][tj]))) ))
+                    }
+                }
+            }
+        }
+
+        for(var i=1; i<g+2; i++){
+            if(i!==ti){
+                simp[i][tj]=(new Fraction(simp[i][tj]).multiply(new Fraction(-1))).divide(new Fraction(simp[ti][tj]))
+            }
+        }
+        for(var j=1; j<stl; j++){
+            if(j!==tj){
+                simp[ti][j]=new Fraction(simp[ti][j]).divide(new Fraction(simp[ti][tj]))
+            }
+        }
+
+        simp[ti][tj]=new Fraction(1).divide(new Fraction(simp[ti][tj]));
+        idTab++;
+
+
+        sympstep0()
+
+    }
+    sympstep0()
+    function sympstep0() {
+        infRebro0()
+        bottomKCheck0()
+        if (stop===0){
+            document.body.innerHTML='';
+            createTbl0()
+            oporSearch0()
+        }
+    }
+    function comeback0() {
+        if (idTab !== 0) {
+            idTab--;
+        }
+    }
+
+
+
+
+
+
+
+</script>
+
+</body>
+</html>
